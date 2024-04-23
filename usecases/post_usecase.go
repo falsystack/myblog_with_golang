@@ -2,9 +2,8 @@ package usecases
 
 import (
 	"log"
-	"toyproject_recruiting_community/dtos"
-	"toyproject_recruiting_community/entities"
 	"toyproject_recruiting_community/repositories"
+	"toyproject_recruiting_community/usecases/dtos"
 )
 
 type PostUsecase interface {
@@ -17,15 +16,7 @@ type postUsecase struct {
 }
 
 func (p *postUsecase) CreatePost(createPost dtos.CreatePost) error {
-	foundUser := p.userRepository.FindUserById(createPost.UserId)
-	// Userフィールドはいるのか？
-	postEntity := entities.Post{
-		Title:   createPost.Title,
-		Content: createPost.Content,
-		User:    foundUser,
-		UserId:  createPost.UserId,
-	}
-	err := p.postRepository.CreatePost(postEntity)
+	err := p.postRepository.CreatePost(createPost)
 	if err != nil {
 		log.Println(err)
 		return err
