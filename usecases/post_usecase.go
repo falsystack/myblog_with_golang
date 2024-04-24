@@ -3,7 +3,7 @@ package usecases
 import (
 	"log"
 	"toyproject_recruiting_community/repositories"
-	"toyproject_recruiting_community/usecases/dtos"
+	"toyproject_recruiting_community/repositories/dtos"
 )
 
 type PostUsecase interface {

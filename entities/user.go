@@ -7,5 +7,5 @@ type User struct {
 	Name     string `gorm:"not null"`
 	Email    string `gorm:"not null; unique"`
 	Password string `gorm:"not null"`
-	Posts    []Post
+	Posts    []Post `gorm:"constraint:OnDelete:CASCADE"`
 }

@@ -3,7 +3,7 @@ package repositories
 import (
 	"gorm.io/gorm"
 	"toyproject_recruiting_community/entities"
-	"toyproject_recruiting_community/usecases/dtos"
+	"toyproject_recruiting_community/repositories/dtos"
 )
 
 type PostRepository interface {

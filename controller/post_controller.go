@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"toyproject_recruiting_community/controller/dtos"
+	ud "toyproject_recruiting_community/repositories/dtos"
 	"toyproject_recruiting_community/usecases"
-	ud "toyproject_recruiting_community/usecases/dtos"
 )
 
 type PostController interface {
