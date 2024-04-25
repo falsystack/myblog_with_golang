@@ -8,10 +8,20 @@ import (
 
 type PostRepository interface {
 	CreatePost(createPost dtos.CreatePost) error
+	FindById(id uint) (*entities.Post, error)
 }
 
 type postRepository struct {
 	db *gorm.DB
+}
+
+func (pr *postRepository) FindById(id uint) (*entities.Post, error) {
+	var post entities.Post
+	tx := pr.db.Find(&post, "id = ?", id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return &post, nil
 }
 
 func (pr *postRepository) CreatePost(createPost dtos.CreatePost) error {

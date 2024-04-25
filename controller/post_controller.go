@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"toyproject_recruiting_community/controller/dtos"
 	ud "toyproject_recruiting_community/repositories/dtos"
 	"toyproject_recruiting_community/usecases"
@@ -10,10 +11,26 @@ import (
 
 type PostController interface {
 	Create(ctx *gin.Context)
+	GetPostById(ctx *gin.Context)
 }
 
 type postController struct {
 	pu usecases.PostUsecase
+}
+
+func (pc *postController) GetPostById(ctx *gin.Context) {
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Post Id"})
+		return
+	}
+
+	postResponse, err := pc.pu.FindById(uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": postResponse})
 }
 
 func (pc *postController) Create(ctx *gin.Context) {

@@ -3,11 +3,13 @@ package usecases
 import (
 	"log"
 	"toyproject_recruiting_community/repositories"
-	"toyproject_recruiting_community/repositories/dtos"
+	rd "toyproject_recruiting_community/repositories/dtos"
+	"toyproject_recruiting_community/response"
 )
 
 type PostUsecase interface {
-	CreatePost(createPost dtos.CreatePost) error
+	CreatePost(createPost rd.CreatePost) error
+	FindById(id uint) (*response.PostResponse, error)
 }
 
 type postUsecase struct {
@@ -15,8 +17,21 @@ type postUsecase struct {
 	userRepository repositories.UserRepository
 }
 
-func (p *postUsecase) CreatePost(createPost dtos.CreatePost) error {
-	err := p.postRepository.CreatePost(createPost)
+func (pu *postUsecase) FindById(id uint) (*response.PostResponse, error) {
+	foundPost, err := pu.postRepository.FindById(id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &response.PostResponse{
+		Title:   foundPost.Title,
+		Content: foundPost.Content,
+	}, nil
+}
+
+func (pu *postUsecase) CreatePost(createPost rd.CreatePost) error {
+	err := pu.postRepository.CreatePost(createPost)
 	if err != nil {
 		log.Println(err)
 		return err
