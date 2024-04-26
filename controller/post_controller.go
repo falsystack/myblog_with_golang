@@ -9,9 +9,11 @@ import (
 	"toyproject_recruiting_community/usecases"
 )
 
+// TODO: もっと良いメソッド名を考える。
 type PostController interface {
 	Create(ctx *gin.Context)
-	GetPostById(ctx *gin.Context)
+	FindPostById(ctx *gin.Context)
+	FindAllPosts(ctx *gin.Context)
 	Remove(ctx *gin.Context)
 }
 
@@ -21,6 +23,15 @@ func NewPostController(pu usecases.PostUsecase) PostController {
 
 type postController struct {
 	pu usecases.PostUsecase
+}
+
+func (pc *postController) FindAllPosts(ctx *gin.Context) {
+	posts, err := pc.pu.FindAll()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected Error"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": posts})
 }
 
 func (pc *postController) Remove(ctx *gin.Context) {
@@ -38,7 +49,7 @@ func (pc *postController) Remove(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (pc *postController) GetPostById(ctx *gin.Context) {
+func (pc *postController) FindPostById(ctx *gin.Context) {
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Post Id"})

@@ -17,8 +17,12 @@ func main() {
 	postController := controller.NewPostController(usecase)
 
 	r := gin.Default()
+	// TODO: もっと綺麗に整理できるか考えてみる
 	postsRouter := r.Group("/posts")
 	postsRouter.POST("", postController.Create)
+	postsRouter.GET("", postController.FindAllPosts)
+	postsRouter.GET(":id", postController.FindPostById)
+	postsRouter.DELETE("/:id", postController.Remove)
 
 	r.Run(":8080")
 
