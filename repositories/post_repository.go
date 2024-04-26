@@ -9,10 +9,28 @@ import (
 type PostRepository interface {
 	CreatePost(createPost dtos.CreatePost) error
 	FindById(id uint) (*entities.Post, error)
+	RemoveById(id uint) error
+}
+
+func NewPostRepository(db *gorm.DB) PostRepository {
+	return &postRepository{db: db}
 }
 
 type postRepository struct {
 	db *gorm.DB
+}
+
+func (pr *postRepository) RemoveById(id uint) error {
+	post, err := pr.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	tx := pr.db.Unscoped().Delete(post)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 func (pr *postRepository) FindById(id uint) (*entities.Post, error) {
@@ -34,8 +52,4 @@ func (pr *postRepository) CreatePost(createPost dtos.CreatePost) error {
 		return result.Error
 	}
 	return nil
-}
-
-func NewPostRepository(db *gorm.DB) PostRepository {
-	return &postRepository{db: db}
 }

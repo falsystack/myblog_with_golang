@@ -10,11 +10,20 @@ import (
 type PostUsecase interface {
 	CreatePost(createPost rd.CreatePost) error
 	FindById(id uint) (*response.PostResponse, error)
+	RemoveById(id uint) error
+}
+
+func NewPostUsecase(postRepository repositories.PostRepository) PostUsecase {
+	return &postUsecase{postRepository: postRepository}
 }
 
 type postUsecase struct {
 	postRepository repositories.PostRepository
 	userRepository repositories.UserRepository
+}
+
+func (pu *postUsecase) RemoveById(id uint) error {
+	return pu.postRepository.RemoveById(id)
 }
 
 func (pu *postUsecase) FindById(id uint) (*response.PostResponse, error) {
@@ -37,8 +46,4 @@ func (pu *postUsecase) CreatePost(createPost rd.CreatePost) error {
 		return err
 	}
 	return nil
-}
-
-func NewPostUsecase(postRepository repositories.PostRepository) PostUsecase {
-	return &postUsecase{postRepository: postRepository}
 }
