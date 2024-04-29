@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"toyproject_recruiting_community/controller/dtos"
 	ud "toyproject_recruiting_community/repositories/dtos"
+	"toyproject_recruiting_community/request"
 	"toyproject_recruiting_community/usecases"
+	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
 // TODO: もっと良いメソッド名を考える。
@@ -15,6 +17,7 @@ type PostController interface {
 	FindPostById(ctx *gin.Context)
 	FindAllPosts(ctx *gin.Context)
 	Remove(ctx *gin.Context)
+	Update(ctx *gin.Context)
 }
 
 func NewPostController(pu usecases.PostUsecase) PostController {
@@ -23,6 +26,27 @@ func NewPostController(pu usecases.PostUsecase) PostController {
 
 type postController struct {
 	pu usecases.PostUsecase
+}
+
+func (pc *postController) Update(ctx *gin.Context) {
+	var requestPost request.UpdatePost
+	if err := ctx.ShouldBindJSON(&requestPost); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id, _ := strconv.ParseUint(string(requestPost.ID), 10, 64)
+	updatePost := update.UpdatePost{
+		ID:      uint(id),
+		Title:   requestPost.Title,
+		Content: requestPost.Content,
+	}
+	resp, err := pc.pu.Update(updatePost)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": resp})
 }
 
 func (pc *postController) FindAllPosts(ctx *gin.Context) {

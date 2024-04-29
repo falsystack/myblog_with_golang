@@ -6,6 +6,7 @@ import (
 	"toyproject_recruiting_community/repositories"
 	rd "toyproject_recruiting_community/repositories/dtos"
 	"toyproject_recruiting_community/response"
+	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
 type PostUsecase interface {
@@ -13,6 +14,7 @@ type PostUsecase interface {
 	FindById(id uint) (*response.PostResponse, error)
 	RemoveById(id uint) error
 	FindAll() (*[]response.PostResponse, error)
+	Update(updatePost update.UpdatePost) (*response.PostResponse, error)
 }
 
 func NewPostUsecase(postRepository repositories.PostRepository) PostUsecase {
@@ -22,6 +24,27 @@ func NewPostUsecase(postRepository repositories.PostRepository) PostUsecase {
 type postUsecase struct {
 	postRepository repositories.PostRepository
 	userRepository repositories.UserRepository
+}
+
+func (pu *postUsecase) Update(updatePost update.UpdatePost) (*response.PostResponse, error) {
+	foundPost, err := pu.postRepository.FindById(updatePost.ID)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	foundPost.Title = updatePost.Title
+	foundPost.Content = updatePost.Content
+
+	updatedPost, err := pu.postRepository.Update(foundPost)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &response.PostResponse{
+		Title:   updatedPost.Title,
+		Content: updatedPost.Content,
+	}, nil
 }
 
 // TODO: pointerタイプとそうではないタイプの使い分けに関して調べてみる。

@@ -12,6 +12,7 @@ type PostRepository interface {
 	FindById(id uint) (*entities.Post, error)
 	FindAll() (*[]entities.Post, error)
 	RemoveById(id uint) error
+	Update(updatePostEntity *entities.Post) (*entities.Post, error)
 }
 
 func NewPostRepository(db *gorm.DB) PostRepository {
@@ -20,6 +21,14 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 
 type postRepository struct {
 	db *gorm.DB
+}
+
+func (pr *postRepository) Update(updatePostEntity *entities.Post) (*entities.Post, error) {
+	tx := pr.db.Save(&updatePostEntity)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return updatePostEntity, nil
 }
 
 // TODO: Go言語のエラーハンドリングを調べてみる。もっと良い方法があるはず。

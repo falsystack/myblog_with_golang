@@ -21,7 +21,8 @@ func main() {
 	postsRouter := r.Group("/posts")
 	postsRouter.POST("", postController.Create)
 	postsRouter.GET("", postController.FindAllPosts)
-	postsRouter.GET(":id", postController.FindPostById)
+	postsRouter.GET("/:id", postController.FindPostById)
+	postsRouter.PUT("", postController.Update)
 	postsRouter.DELETE("/:id", postController.Remove)
 
 	r.Run(":8080")
