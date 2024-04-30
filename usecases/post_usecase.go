@@ -9,13 +9,12 @@ import (
 	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
-// TODO: ファイル名変更
 type PostUsecase interface {
-	CreatePost(createPost rd.CreatePost) error
+	Create(createPost rd.CreatePost) error
 	FindById(id uint) (*response.PostResponse, error)
-	RemoveById(id uint) error
 	FindAll() (*[]response.PostResponse, error)
 	Update(updatePost update.UpdatePost) (*response.PostResponse, error)
+	RemoveById(id uint) error
 }
 
 func NewPostUsecase(postRepository repositories.PostRepository) PostUsecase {
@@ -86,7 +85,7 @@ func (pu *postUsecase) FindById(id uint) (*response.PostResponse, error) {
 	}, nil
 }
 
-func (pu *postUsecase) CreatePost(createPost rd.CreatePost) error {
+func (pu *postUsecase) Create(createPost rd.CreatePost) error {
 	err := pu.postRepository.CreatePost(createPost)
 	if err != nil {
 		log.Println(err)

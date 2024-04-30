@@ -7,7 +7,6 @@ import (
 	"toyproject_recruiting_community/repositories/dtos"
 )
 
-// TODO: ファイル名変更
 type PostRepository interface {
 	CreatePost(createPost dtos.CreatePost) error
 	FindById(id uint) (*entities.Post, error)

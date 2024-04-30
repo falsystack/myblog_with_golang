@@ -11,16 +11,24 @@ import (
 	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
-// TODO: フィいる名をGoらしく変える。
-// TODO: もっと良いメソッド名を考える。
+/**
+悩み
+- Controller の宣言部のみをみると何を返しいるかが把握できない
+- 注釈をつけて（つけたくないが）何を返しているかを見えるようにする
+*/
+
 type PostController interface {
 	Create(ctx *gin.Context)
-	// TODO: IDも一緒に返却するように修正
-	FindPostById(ctx *gin.Context)
-	// TODO: IDも一緒に返却するように修正
-	FindAllPosts(ctx *gin.Context)
-	Remove(ctx *gin.Context)
-	// TODO: idはpath variableとして受け取るように修正
+
+	// FindById return response.PostResponse
+	FindById(ctx *gin.Context)
+
+	// FindAll return []response.PostResponse
+	FindAll(ctx *gin.Context)
+
+	RemoveById(ctx *gin.Context)
+
+	// Update return response.PostResponse
 	Update(ctx *gin.Context)
 }
 
@@ -33,13 +41,18 @@ type postController struct {
 }
 
 func (pc *postController) Update(ctx *gin.Context) {
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	var requestPost request.UpdatePost
 	if err := ctx.ShouldBindJSON(&requestPost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id, _ := strconv.ParseUint(string(requestPost.ID), 10, 64)
 	updatePost := update.UpdatePost{
 		ID:      uint(id),
 		Title:   requestPost.Title,
@@ -53,7 +66,7 @@ func (pc *postController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": resp})
 }
 
-func (pc *postController) FindAllPosts(ctx *gin.Context) {
+func (pc *postController) FindAll(ctx *gin.Context) {
 	posts, err := pc.pu.FindAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected Error"})
@@ -62,7 +75,7 @@ func (pc *postController) FindAllPosts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": posts})
 }
 
-func (pc *postController) Remove(ctx *gin.Context) {
+func (pc *postController) RemoveById(ctx *gin.Context) {
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Post Id"})
@@ -77,7 +90,7 @@ func (pc *postController) Remove(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (pc *postController) FindPostById(ctx *gin.Context) {
+func (pc *postController) FindById(ctx *gin.Context) {
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Post Id"})
@@ -105,7 +118,7 @@ func (pc *postController) Create(ctx *gin.Context) {
 		Title:   inputPost.Title,
 		Content: inputPost.Content,
 	}
-	if err := pc.pu.CreatePost(createPost); err != nil {
+	if err := pc.pu.Create(createPost); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
