@@ -11,12 +11,16 @@ import (
 	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
+// TODO: フィいる名をGoらしく変える。
 // TODO: もっと良いメソッド名を考える。
 type PostController interface {
 	Create(ctx *gin.Context)
+	// TODO: IDも一緒に返却するように修正
 	FindPostById(ctx *gin.Context)
+	// TODO: IDも一緒に返却するように修正
 	FindAllPosts(ctx *gin.Context)
 	Remove(ctx *gin.Context)
+	// TODO: idはpath variableとして受け取るように修正
 	Update(ctx *gin.Context)
 }
 

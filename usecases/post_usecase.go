@@ -9,6 +9,7 @@ import (
 	"toyproject_recruiting_community/usecases/dtos/update"
 )
 
+// TODO: ファイル名変更
 type PostUsecase interface {
 	CreatePost(createPost rd.CreatePost) error
 	FindById(id uint) (*response.PostResponse, error)

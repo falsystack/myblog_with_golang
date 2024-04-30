@@ -7,6 +7,7 @@ import (
 	"toyproject_recruiting_community/repositories/dtos"
 )
 
+// TODO: ファイル名変更
 type UserRepository interface {
 	Create(createUser dtos.CreateUser) error
 	FindUserById(userId uint) entities.User
