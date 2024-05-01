@@ -46,7 +46,7 @@ func (pc *postController) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
-
+	// TODO: 全てのdtoの位置の調整が必要
 	var requestPost request.UpdatePost
 	if err := ctx.ShouldBindJSON(&requestPost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -97,6 +97,25 @@ r := new(response.PostResponse)
 r.Init()
 ```
 
+### 返り値が一目に見えない
+- Controller の宣言部のみをみると何を返しいるかが把握できない
+- 注釈をつけて（つけたくないが）何を返しているかを見えるようにする
+```go
+type PostController interface {
+Create(ctx *gin.Context)
+
+	// FindById return response.PostResponse
+	FindById(ctx *gin.Context)
+
+	// FindAll return []response.PostResponse
+	FindAll(ctx *gin.Context)
+
+	// Update return response.PostResponse
+	Update(ctx *gin.Context)
+
+	RemoveById(ctx *gin.Context)
+}
+```
 
 
 - プロジェクト全体のerror handlingのやり方
