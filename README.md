@@ -44,3 +44,59 @@
 ![erd](resources/erd.png)
 
 
+
+
+## 実装中の悩み
+
+### カプセル化
+- Go言語の`struct`をカプセル化がしたいがどうすればいいか
+  - structを返り値のタイプとして使う場合
+  - `&struct{}`でインスタンスが生成できてしまいカプセル化ができない
+  - compileエラーも出ないので困る
+  - filedを小文字化し外部からの参照を防ぐ
+
+**コンストラクタを提供してparameterを渡さないとcompileエラーが出るようにする方法**
+- 伝統的な方法で使い勝手も良いと感じた
+```go
+type PostResponse struct {
+	id      uint   `json:"id" binding:"required"`
+	title   string `json:"title" binding:"required"`
+	content string `json:"content" binding:"required"`
+}
+
+func NewPostResponse(id uint, title, content string) *PostResponse {
+	return &PostResponse{
+		id:      id,
+		title:   title,
+		content: content,
+	}
+}
+```
+
+**structのInitメソッドを作成する方法**
+- 使い勝手が悪いなと感じた。
+```go
+type PostResponse struct {
+  id      uint   `json:"id" binding:"required"`
+  title   string `json:"title" binding:"required"`
+  content string `json:"content" binding:"required"`
+}
+
+func (pr PostResponse) Init(id uint, title, content string) {
+  pr.id = id
+  pr.title = title
+  pr.content = content
+}
+
+// new()でインスタンスを生成
+r := new(response.PostResponse)
+// Initメソッドで初期化
+r.Init()
+```
+
+
+
+- プロジェクト全体のerror handlingのやり方
+
+- pointerタイプとそうではないタイプの使い分けに関して調べてみる。 
+  - 重いオブジェクトにだけポインタータイプを使うのか

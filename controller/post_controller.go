@@ -26,10 +26,10 @@ type PostController interface {
 	// FindAll return []response.PostResponse
 	FindAll(ctx *gin.Context)
 
-	RemoveById(ctx *gin.Context)
-
 	// Update return response.PostResponse
 	Update(ctx *gin.Context)
+
+	RemoveById(ctx *gin.Context)
 }
 
 func NewPostController(pu usecases.PostUsecase) PostController {

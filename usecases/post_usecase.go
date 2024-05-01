@@ -12,7 +12,7 @@ import (
 type PostUsecase interface {
 	Create(createPost rd.CreatePost) error
 	FindById(id uint) (*response.PostResponse, error)
-	FindAll() (*[]response.PostResponse, error)
+	FindAll() ([]*response.PostResponse, error)
 	Update(updatePost update.UpdatePost) (*response.PostResponse, error)
 	RemoveById(id uint) error
 }
@@ -41,31 +41,32 @@ func (pu *postUsecase) Update(updatePost update.UpdatePost) (*response.PostRespo
 		return nil, err
 	}
 
-	return &response.PostResponse{
-		Title:   updatedPost.Title,
-		Content: updatedPost.Content,
-	}, nil
+	return response.NewPostResponse(
+		updatePost.ID,
+		updatePost.Title,
+		updatedPost.Content,
+	), nil
 }
 
-// TODO: pointerタイプとそうではないタイプの使い分けに関して調べてみる。
-// 重いオブジェクトにだけポインタータイプを使うのか
-func (pu *postUsecase) FindAll() (*[]response.PostResponse, error) {
+func (pu *postUsecase) FindAll() ([]*response.PostResponse, error) {
 	posts, err := pu.postRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
 
 	if len(*posts) < 1 {
-		return nil, errors.New("no posts found")
+		return nil, errors.New("Post Not Found")
 	}
-	var responses []response.PostResponse
+
+	var responses []*response.PostResponse
 	for _, post := range *posts {
-		responses = append(responses, response.PostResponse{
-			Title:   post.Title,
-			Content: post.Content,
-		})
+		responses = append(responses, response.NewPostResponse(
+			post.ID,
+			post.Title,
+			post.Content,
+		))
 	}
-	return &responses, nil
+	return responses, nil
 }
 
 func (pu *postUsecase) RemoveById(id uint) error {
@@ -79,10 +80,10 @@ func (pu *postUsecase) FindById(id uint) (*response.PostResponse, error) {
 		return nil, err
 	}
 
-	return &response.PostResponse{
-		Title:   foundPost.Title,
-		Content: foundPost.Content,
-	}, nil
+	return response.NewPostResponse(
+		foundPost.ID,
+		foundPost.Title,
+		foundPost.Content), nil
 }
 
 func (pu *postUsecase) Create(createPost rd.CreatePost) error {
