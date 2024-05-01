@@ -37,6 +37,9 @@
 ## Architecture
 ### v0.1スコープ
 - Clean Architectureを採用
+
+![clean](resources/clean_architecture.png)
+
 ### v0.1スコープ以後
 - MSA導入
 
