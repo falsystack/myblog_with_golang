@@ -3,14 +3,15 @@ package usecases
 import (
 	"errors"
 	"log"
+	"toyproject_recruiting_community/entities"
 	"toyproject_recruiting_community/repositories"
-	rd "toyproject_recruiting_community/repositories/dtos"
 	"toyproject_recruiting_community/response"
 	"toyproject_recruiting_community/usecases/dtos/update"
+	"toyproject_recruiting_community/usecases/input"
 )
 
 type PostUsecase interface {
-	Create(createPost rd.CreatePost) error
+	Create(inputPost *input.Post) error
 	FindById(id uint) (*response.PostResponse, error)
 	FindAll() ([]*response.PostResponse, error)
 	Update(updatePost update.UpdatePost) (*response.PostResponse, error)
@@ -86,8 +87,9 @@ func (pu *postUsecase) FindById(id uint) (*response.PostResponse, error) {
 		foundPost.Content), nil
 }
 
-func (pu *postUsecase) Create(createPost rd.CreatePost) error {
-	err := pu.postRepository.CreatePost(createPost)
+func (pu *postUsecase) Create(inputPost *input.Post) error {
+	post := entities.NewPost(inputPost.Title, inputPost.Content)
+	err := pu.postRepository.CreatePost(post)
 	if err != nil {
 		log.Println(err)
 		return err

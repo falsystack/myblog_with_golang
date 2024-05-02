@@ -97,6 +97,27 @@ r := new(response.PostResponse)
 r.Init()
 ```
 
+**小文字かによりDTOのフィールドに接近できなく値を取れない問題**
+- 将来structのフィールドが50個になったら全部Getterを作るのはとんでもなくしんどいと思った
+- ので、Input, Output用のDTOはカプセル化を緩くする政策をとる（Trade-off）
+```go
+//  Input , Output用のDTOはカプセル化をゆるくするようにする
+func NewInputPost(title, content string) *Post {
+	return &Post{title: title, content: content}
+}
+
+//  Javaぽくなったが、、、これでいいのか
+//  Getter, Setterの自動生成がない、、、
+//  フィールドが50個だったら？
+func (p *Post) GetTitle() string {
+	return p.title
+}
+
+func (p *Post) GetContent() string {
+	return p.content
+}
+```
+
 ### 返り値が一目に見えない
 - Controller の宣言部のみをみると何を返しいるかが把握できない
 - 注釈をつけて（つけたくないが）何を返しているかを見えるようにする

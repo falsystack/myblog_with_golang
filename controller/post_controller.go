@@ -4,11 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"toyproject_recruiting_community/controller/dtos"
-	ud "toyproject_recruiting_community/repositories/dtos"
 	"toyproject_recruiting_community/request"
 	"toyproject_recruiting_community/usecases"
 	"toyproject_recruiting_community/usecases/dtos/update"
+	"toyproject_recruiting_community/usecases/input"
 )
 
 /**
@@ -46,7 +45,6 @@ func (pc *postController) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
-	// TODO: 全てのdtoの位置の調整が必要
 	var requestPost request.UpdatePost
 	if err := ctx.ShouldBindJSON(&requestPost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -106,19 +104,13 @@ func (pc *postController) FindById(ctx *gin.Context) {
 }
 
 func (pc *postController) Create(ctx *gin.Context) {
-	var inputPost dtos.CreateInputPost
-	if err := ctx.ShouldBind(&inputPost); err != nil {
+	inputPost := &input.Post{}
+	if err := ctx.ShouldBind(inputPost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Go言語はJava(Spring)と違ってController側で開発者が直接Bindしているので
-	// Front -> Controllerの間に使うDTOとController -> Usecaseの間に使うDTOの境界が曖昧だと感じた。
-	createPost := ud.CreatePost{
-		Title:   inputPost.Title,
-		Content: inputPost.Content,
-	}
-	if err := pc.pu.Create(createPost); err != nil {
+	if err := pc.pu.Create(inputPost); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

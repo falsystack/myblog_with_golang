@@ -4,6 +4,18 @@ import "gorm.io/gorm"
 
 type Post struct {
 	gorm.Model
-	Title   string `gorm:"not null"`
-	Content string `gorm:"not null"`
+	title   string `gorm:"not null"`
+	content string `gorm:"not null"`
+}
+
+func (p *Post) GetTitle() string {
+	return p.title
+}
+
+func (p *Post) GetContent() string {
+	return p.content
+}
+
+func NewPost(title string, content string) *Post {
+	return &Post{title: title, content: content}
 }
