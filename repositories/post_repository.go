@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"log"
 	"toyproject_recruiting_community/entities"
@@ -30,7 +31,6 @@ func (pr *postRepository) Update(updatePostEntity *entities.Post) (*entities.Pos
 	return updatePostEntity, nil
 }
 
-// TODO: Go言語のエラーハンドリングを調べてみる。もっと良い方法があるはず。
 func (pr *postRepository) FindAll() (*[]entities.Post, error) {
 	var posts []entities.Post
 	tx := pr.db.Find(&posts)
@@ -56,10 +56,14 @@ func (pr *postRepository) RemoveById(id uint) error {
 
 func (pr *postRepository) FindById(id uint) (*entities.Post, error) {
 	var post entities.Post
-	tx := pr.db.Find(&post, "id = ?", id)
+	tx := pr.db.First(&post, "id = ?", id)
 	if tx.Error != nil {
+		if tx.Error.Error() == "record not found" {
+			return nil, errors.New("post not found")
+		}
 		return nil, tx.Error
 	}
+
 	return &post, nil
 }
 
