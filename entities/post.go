@@ -8,8 +8,9 @@ import (
 
 type Post struct {
 	gorm.Model
-	Title   string `gorm:"not null"`
-	Content string `gorm:"not null"`
+	Title   string `json:"title" gorm:"not null"`
+	Content string `json:"content" gorm:"not null"`
+	UserID  uint
 }
 
 func NewPost(title string, content string) *Post {

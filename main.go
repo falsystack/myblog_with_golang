@@ -16,6 +16,12 @@ func main() {
 
 	postRouter(r, db)
 
+	// auth
+	authController := controller.NewAuthController()
+	authRouter := r.Group("/auth")
+	authRouter.GET("/google/login", authController.GoogleLogin)
+	authRouter.GET("/google/callback", authController.GoogleAuthCallback)
+
 	r.Run(":8080")
 
 }
