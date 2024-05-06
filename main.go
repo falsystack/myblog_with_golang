@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"toyproject_recruiting_community/controller"
 	"toyproject_recruiting_community/infra"
+	"toyproject_recruiting_community/middleware"
 	"toyproject_recruiting_community/repositories"
 	"toyproject_recruiting_community/usecases"
 )
@@ -31,7 +32,7 @@ func postRouter(r *gin.Engine, db *gorm.DB) {
 	usecase := usecases.NewPostUsecase(repository)
 	postController := controller.NewPostController(usecase)
 
-	postsRouter := r.Group("/posts")
+	postsRouter := r.Group("/posts", middleware.AuthMiddleware())
 	postsRouter.POST("", postController.Create)
 	postsRouter.GET("", postController.FindAll)
 	postsRouter.GET("/:id", postController.FindById)

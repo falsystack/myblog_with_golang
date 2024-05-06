@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -53,6 +54,7 @@ func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
 	}
 	state := ctx.Request.URL.Query().Get("state")
 	if state != oauthstate {
+		log.Println("invalid oauth state", state)
 		ctx.Redirect(http.StatusTemporaryRedirect, "/")
 		return
 	}
@@ -76,8 +78,18 @@ func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
 		log.Println(err)
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": goauth})
-
+	// jwtを生成
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub":   goauth.ID,
+		"email": goauth.Email,
+		"exp":   time.Now().Add(time.Hour).Unix(),
+	})
+	signedJwt, err := jwtToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": &signedJwt})
 }
 
 func (a *authController) GoogleLogin(ctx *gin.Context) {
