@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -29,9 +30,9 @@ type AuthController interface {
 	GoogleLogin(ctx *gin.Context)
 	GoogleAuthCallback(ctx *gin.Context)
 	Logout(ctx *gin.Context)
-}
-
-type authController struct {
+	// TODO: FindByID
+	FindByID(ctx *gin.Context)
+	// TODO: Create
 }
 
 func NewAuthController() AuthController {
@@ -44,6 +45,18 @@ func NewAuthController() AuthController {
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 	}
 	return &authController{}
+}
+
+type authController struct {
+}
+
+func (a *authController) FindByID(ctx *gin.Context) {
+	parsedID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 }
 
 func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
@@ -77,6 +90,8 @@ func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	// TODO: UserがDBにないと登録する
 
 	// jwtを生成
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
