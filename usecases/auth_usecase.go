@@ -23,4 +23,9 @@ func (a *authUsecase) FindByID(id uint) (*output.AuthResponse, error) {
 		return nil, err
 	}
 
+	return output.NewAuthResponse(
+		user.ID,
+		user.Name,
+		user.Email,
+	), nil
 }

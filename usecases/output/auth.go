@@ -1,7 +1,15 @@
 package output
 
 type AuthResponse struct {
-	// TODO: Field追加
+	ID    uint   `json:"id"`
+	Name  string `json:"name" gorm:"unique"`
+	Email string `json:"email" gorm:"unique"`
 }
 
-// TODO: コンストラクタ追加
+func NewAuthResponse(id uint, name, email string) *AuthResponse {
+	return &AuthResponse{
+		ID:    id,
+		Name:  name,
+		Email: email,
+	}
+}

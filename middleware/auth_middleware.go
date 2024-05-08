@@ -9,9 +9,10 @@ import (
 	"os"
 	"strings"
 	"time"
+	"toyproject_recruiting_community/usecases"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		header := ctx.GetHeader("Authorization")
 		if len(header) == 0 {
@@ -43,12 +44,14 @@ func AuthMiddleware() gin.HandlerFunc {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": jwt.ErrTokenExpired})
 				return
 			}
+			id := claims["id"].(uint)
+			user, err := au.FindByID(id)
+			if err != nil {
+				ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
+			}
+			ctx.Set("user", user)
 		}
 
-		// TODO: Find User
-
-		// TODO: Set User
-		//ctx.Set("user", user)
 		ctx.Next()
 
 	}
