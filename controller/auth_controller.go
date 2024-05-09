@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"toyproject_recruiting_community/usecases"
 )
 
 var googleOauthConfig oauth2.Config
@@ -48,6 +49,7 @@ func NewAuthController() AuthController {
 }
 
 type authController struct {
+	au usecases.AuthUsecase
 }
 
 func (a *authController) FindByID(ctx *gin.Context) {
@@ -56,6 +58,14 @@ func (a *authController) FindByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
+
+	user, err := a.au.FindByID(uint(parsedID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": user})
 
 }
 

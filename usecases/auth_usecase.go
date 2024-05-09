@@ -9,16 +9,16 @@ type AuthUsecase interface {
 	FindByID(id uint) (*output.AuthResponse, error)
 }
 
-func NewAuthUsecase() AuthUsecase {
-	return &authUsecase{}
+func NewAuthUsecase(ar repositories.AuthRepository) AuthUsecase {
+	return &authUsecase{ar: ar}
 }
 
 type authUsecase struct {
-	authRepository repositories.AuthRepository
+	ar repositories.AuthRepository
 }
 
 func (a *authUsecase) FindByID(id uint) (*output.AuthResponse, error) {
-	user, err := a.authRepository.FindById(id)
+	user, err := a.ar.FindById(id)
 	if err != nil {
 		return nil, err
 	}
