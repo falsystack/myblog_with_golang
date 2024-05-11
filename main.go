@@ -31,7 +31,7 @@ func postRouter(r *gin.Engine, db *gorm.DB) {
 	postRepository := repositories.NewPostRepository(db)
 	authRepository := repositories.NewAuthRepository(db)
 	postUsecase := usecases.NewPostUsecase(postRepository)
-	authUsecase := usecases.NewAuthUsecase()
+	authUsecase := usecases.NewAuthUsecase(authRepository)
 	postController := controller.NewPostController(postUsecase)
 
 	postsRouter := r.Group("/posts", middleware.AuthMiddleware(authUsecase))

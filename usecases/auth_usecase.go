@@ -6,7 +6,7 @@ import (
 )
 
 type AuthUsecase interface {
-	FindByID(id uint) (*output.AuthResponse, error)
+	FindByID(id string) (*output.AuthResponse, error)
 }
 
 func NewAuthUsecase(ar repositories.AuthRepository) AuthUsecase {
@@ -17,7 +17,7 @@ type authUsecase struct {
 	ar repositories.AuthRepository
 }
 
-func (a *authUsecase) FindByID(id uint) (*output.AuthResponse, error) {
+func (a *authUsecase) FindByID(id string) (*output.AuthResponse, error) {
 	user, err := a.ar.FindById(id)
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@ import (
 type PostUsecase interface {
 	Create(inputPost *input.CreatePost) error
 	FindById(id uint) (*output.PostResponse, error)
-	Update(updatePost *input.UpdatePost) (*output.PostResponse, error)
+	Update(updatePost *input.UpdatePost, userId string) (*output.PostResponse, error)
 	FindAll() ([]output.PostResponse, error)
 	RemoveById(id uint) error
 }
@@ -24,8 +24,8 @@ type postUsecase struct {
 	postRepository repositories.PostRepository
 }
 
-func (pu *postUsecase) Update(updatePost *input.UpdatePost) (*output.PostResponse, error) {
-	foundPost, err := pu.postRepository.FindById(updatePost.ID)
+func (pu *postUsecase) Update(updatePost *input.UpdatePost, userId string) (*output.PostResponse, error) {
+	foundPost, err := pu.postRepository.FindByPostWithUserID(updatePost.ID, userId)
 	if err != nil {
 		log.Println(err)
 		return nil, err

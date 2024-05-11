@@ -16,19 +16,18 @@ func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		header := ctx.GetHeader("Authorization")
 		if len(header) == 0 {
-			log.Println("No Authorization header")
-			ctx.AbortWithStatus(http.StatusUnauthorized)
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "No Authorization header"})
+			ctx.Abort()
 		}
 
 		if !strings.HasPrefix(header, "Bearer ") {
-			log.Println("Invalid Authorization header")
-			ctx.AbortWithStatus(http.StatusUnauthorized)
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header"})
+			ctx.Abort()
 		}
 
 		tokenStr := strings.TrimPrefix(header, "Bearer ")
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				log.Println("Unexpected signing method")
 				ctx.AbortWithStatus(http.StatusUnauthorized)
 				return nil, fmt.Errorf("Unexpected signing method %v", token.Header["alg"])
 			}
@@ -37,17 +36,20 @@ func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
-			return
+			ctx.Abort()
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if float64(time.Now().Unix()) > claims["exp"].(float64) {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": jwt.ErrTokenExpired})
-				return
+				ctx.Abort()
 			}
-			id := claims["id"].(uint)
+			id := claims["sub"].(string)
 			user, err := au.FindByID(id)
 			if err != nil {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
+				// AbortなしでJSONだげでレスポンスを返すと{data: null}{error : "error message}変な形で返す。
+				// ctx.JSON -> ctx.Abortで解決
+				ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+				ctx.Abort()
 			}
 			ctx.Set("user", user)
 		}

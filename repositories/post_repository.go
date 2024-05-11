@@ -10,6 +10,7 @@ import (
 type PostRepository interface {
 	CreatePost(post *entities.Post) error
 	FindById(id uint) (*entities.Post, error)
+	FindByPostWithUserID(postID uint, userID string) (*entities.Post, error)
 	FindAll() (*[]entities.Post, error)
 	RemoveById(id uint) error
 	Update(updatePostEntity *entities.Post) (*entities.Post, error)
@@ -21,6 +22,17 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 
 type postRepository struct {
 	db *gorm.DB
+}
+
+func (pr *postRepository) FindByPostWithUserID(postID uint, userID string) (*entities.Post, error) {
+	var post *entities.Post
+	tx := pr.db.Where("id = ? AND user_id = ?", postID, userID).First(&post)
+	if tx.Error != nil {
+		if tx.Error.Error() == "record not found" {
+			return nil, errors.New("post not found with userID")
+		}
+	}
+	return post, nil
 }
 
 func (pr *postRepository) Update(updatePostEntity *entities.Post) (*entities.Post, error) {

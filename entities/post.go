@@ -10,7 +10,7 @@ type Post struct {
 	gorm.Model
 	Title   string `json:"title" gorm:"not null"`
 	Content string `json:"content" gorm:"not null"`
-	UserID  uint
+	UserID  string `json:"user_id" gorm:"not null"`
 }
 
 func NewPost(title string, content string) *Post {
