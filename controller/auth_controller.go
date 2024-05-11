@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 	"toyproject_recruiting_community/usecases"
 )
@@ -31,8 +30,6 @@ type AuthController interface {
 	GoogleLogin(ctx *gin.Context)
 	GoogleAuthCallback(ctx *gin.Context)
 	Logout(ctx *gin.Context)
-	// TODO: FindByID
-	FindByID(ctx *gin.Context)
 	// TODO: Create
 }
 
@@ -50,23 +47,6 @@ func NewAuthController() AuthController {
 
 type authController struct {
 	au usecases.AuthUsecase
-}
-
-func (a *authController) FindByID(ctx *gin.Context) {
-	parsedID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-		return
-	}
-
-	user, err := a.au.FindByID(uint(parsedID))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"data": user})
-
 }
 
 func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
