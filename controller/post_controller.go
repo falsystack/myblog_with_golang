@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"toyproject_recruiting_community/usecases"
 	"toyproject_recruiting_community/usecases/input"
+	"toyproject_recruiting_community/usecases/output"
 )
 
 /**
@@ -32,19 +33,28 @@ type postController struct {
 
 // Update return output.PostResponse
 func (pc *postController) Update(ctx *gin.Context) {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	// TODO: 認証済みで自分が投稿したポストのみが編集できるようにする
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	uid := user.(output.AuthResponse).ID
+
+	pid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 	var updatePost input.UpdatePost
-	updatePost.ID = uint(id)
+	updatePost.ID = uint(pid)
 	if err := ctx.ShouldBindJSON(&updatePost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	resp, err := pc.pu.Update(&updatePost)
+	resp, err := pc.pu.Update(&updatePost, uid)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
