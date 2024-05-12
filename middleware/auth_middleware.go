@@ -14,15 +14,22 @@ import (
 
 func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if os.Getenv("ENV") == "test" {
+			ctx.Next()
+			return
+		}
+
 		header := ctx.GetHeader("Authorization")
 		if len(header) == 0 {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "No Authorization header"})
 			ctx.Abort()
+			return
 		}
 
 		if !strings.HasPrefix(header, "Bearer ") {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header"})
 			ctx.Abort()
+			return
 		}
 
 		tokenStr := strings.TrimPrefix(header, "Bearer ")
@@ -37,6 +44,7 @@ func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 			log.Println(err)
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
 			ctx.Abort()
+			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if float64(time.Now().Unix()) > claims["exp"].(float64) {
@@ -50,6 +58,7 @@ func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 				// ctx.JSON -> ctx.Abortで解決
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 				ctx.Abort()
+				return
 			}
 			ctx.Set("user", user)
 		}

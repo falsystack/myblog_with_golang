@@ -27,13 +27,14 @@ func TestMain(m *testing.M) {
 
 func setupTestData(db *gorm.DB) {
 	posts := []*entities.Post{
-		{Title: "テストアイテム1", Content: "", UserID: 1},
-		{Title: "テストアイテム2", Content: "テスト2", UserID: 1},
-		{Title: "テストアイテム3", Content: "テスト3", UserID: 2},
+		{Title: "テストアイテム1", Content: "", UserID: "94A803A5-82BA-4BBB-B597-DE97569A4F3C"},
+		{Title: "テストアイテム2", Content: "テスト2", UserID: "94A803A5-82BA-4BBB-B597-DE97569A4F3C"},
+		{Title: "テストアイテム3", Content: "テスト3", UserID: "94A803A5-82BA-4BBB-B597-DE97569A4F3C"},
 	}
 
 	users := []*entities.User{
 		{
+			ID:    "94A803A5-82BA-4BBB-B597-DE97569A4F3C",
 			Name:  "testuser1",
 			Email: "test1@example.com",
 		},
