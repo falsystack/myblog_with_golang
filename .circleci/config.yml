@@ -23,6 +23,3 @@ workflows:
   build-and-test:
     jobs:
       - test-go
-      - build-go-executables:
-          requires:
-            - test-go
