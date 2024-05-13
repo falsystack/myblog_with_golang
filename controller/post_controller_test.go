@@ -94,3 +94,29 @@ func TestCreatePost(t *testing.T) {
 	// then
 	assert.Equal(t, http.StatusCreated, w.Code)
 }
+
+func TestFindByID(t *testing.T) {
+	// given
+	db := setup()
+	postRepository := repositories.NewPostRepository(db)
+	postUsecase := usecases.NewPostUsecase(postRepository)
+	postController := NewPostController(postUsecase)
+
+	req := httptest.NewRequest("GET", "/posts/3", nil)
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	_, r := gin.CreateTestContext(w)
+
+	// when
+	r.GET("/posts/:id", postController.FindById)
+	r.ServeHTTP(w, req)
+
+	// then
+	var res map[string]entities.Post
+	json.Unmarshal([]byte(w.Body.String()), &res)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "テストアイテム3", res["data"].Title)
+	assert.Equal(t, uint(3), res["data"].ID)
+}

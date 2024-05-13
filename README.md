@@ -147,5 +147,18 @@ Create(ctx *gin.Context)
 	RemoveById(ctx *gin.Context)
 }
 ```
+### Pointerタイプの色々な悩み
+- Pointerタイプでスライスを返すとindexingして接近できない
+```go
+// 返り値は *[]entities.Post
+posts, err := postRepository.FindAll()
 
+// 接近不可
+posts[0].ID
+// 接近不可
+*posts[0].ID
+
+// 接近可能
+(*posts)[0].ID
+```
 
