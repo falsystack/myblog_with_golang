@@ -1,6 +1,7 @@
-package main
+package controller
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,12 +15,13 @@ import (
 	"testing"
 	"toyproject_recruiting_community/entities"
 	"toyproject_recruiting_community/infra"
-	"toyproject_recruiting_community/router"
-	"toyproject_recruiting_community/usecases/output"
+	"toyproject_recruiting_community/repositories"
+	"toyproject_recruiting_community/usecases"
+	"toyproject_recruiting_community/usecases/input"
 )
 
 func TestMain(m *testing.M) {
-	if err := godotenv.Load(".env.test"); err != nil {
+	if err := godotenv.Load("../.env.test"); err != nil {
 		log.Fatal("Error loading .env.test file")
 	}
 
@@ -54,32 +56,41 @@ func setupTestData(db *gorm.DB) {
 	}
 }
 
-func setup() *gin.Engine {
+func setup() *gorm.DB {
 	db := infra.SetupDB()
 	db.AutoMigrate(&entities.User{}, &entities.Post{})
 
 	setupTestData(db)
-	r := gin.Default()
+	//r := gin.Default()
 
-	router.PostRouter(r, db)
-	return r
+	//return r
+	return db
 }
 
-func TestPostController(t *testing.T) {
+func TestCreatePost(t *testing.T) {
 	// given
-	r := setup()
+	db := setup()
+	postRepository := repositories.NewPostRepository(db)
+	postUsecase := usecases.NewPostUsecase(postRepository)
+	postController := NewPostController(postUsecase)
+
+	createPost := input.CreatePost{
+		Title:   "Test Post",
+		Content: "Test Content",
+	}
+	reqBody, _ := json.Marshal(createPost)
+
+	req, _ := http.NewRequest("POST", "/posts", bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/posts", nil)
+
+	_, router := gin.CreateTestContext(w)
 
 	// when
-	r.ServeHTTP(w, req)
+	router.POST("/posts", postController.Create)
+	router.ServeHTTP(w, req)
 
-	var resp map[string][]output.PostResponse
-	json.Unmarshal([]byte(w.Body.String()), &resp)
-
-	fmt.Println(w.Body)
 	// then
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, 3, len(resp["data"]))
+	assert.Equal(t, http.StatusCreated, w.Code)
 }

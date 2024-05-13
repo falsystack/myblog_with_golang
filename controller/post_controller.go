@@ -105,13 +105,13 @@ func (pc *postController) FindById(ctx *gin.Context) {
 
 // Create receives input.CreatePost as an argument and generate entities.Post
 func (pc *postController) Create(ctx *gin.Context) {
-	createPost := &input.CreatePost{}
-	if err := ctx.ShouldBind(createPost); err != nil {
+	var createPost input.CreatePost
+	if err := ctx.ShouldBind(&createPost); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := pc.pu.Create(createPost); err != nil {
+	if err := pc.pu.Create(&createPost); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
