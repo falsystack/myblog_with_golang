@@ -15,6 +15,8 @@ import (
 func AuthMiddleware(au usecases.AuthUsecase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if os.Getenv("ENV") == "test" {
+			user, _ := au.FindByID("94A803A5-82BA-4BBB-B597-DE97569A4F3C")
+			ctx.Set("user", user)
 			ctx.Next()
 			return
 		}

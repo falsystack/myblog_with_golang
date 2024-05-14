@@ -40,7 +40,7 @@ func (pc *postController) Update(ctx *gin.Context) {
 		return
 	}
 
-	uid := user.(output.AuthResponse).ID
+	uid := user.(*output.AuthResponse).ID
 
 	pid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {

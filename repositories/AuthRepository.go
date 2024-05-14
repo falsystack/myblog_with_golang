@@ -24,7 +24,7 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 func (ar *authRepository) FindById(id string) (*entities.User, error) {
 	var user entities.User
 	// Findメソッドを使うとエラーを吐き出さない、のでFirstに変更する
-	tx := ar.db.First(&user).Where("id = ?", id)
+	tx := ar.db.First(&user, "id = ?", id)
 	if tx.Error != nil {
 		if tx.Error.Error() == RecordNotFoundError.Error() {
 			return nil, UserNotFoundError

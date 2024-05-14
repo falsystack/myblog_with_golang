@@ -15,9 +15,11 @@ import (
 	"testing"
 	"toyproject_recruiting_community/entities"
 	"toyproject_recruiting_community/infra"
+	"toyproject_recruiting_community/middleware"
 	"toyproject_recruiting_community/repositories"
 	"toyproject_recruiting_community/usecases"
 	"toyproject_recruiting_community/usecases/input"
+	"toyproject_recruiting_community/usecases/output"
 )
 
 func TestMain(m *testing.M) {
@@ -58,6 +60,7 @@ func setupTestData(db *gorm.DB) {
 
 func setup() *gorm.DB {
 	db := infra.SetupDB()
+	db.Migrator().DropTable(&entities.User{}, &entities.Post{})
 	db.AutoMigrate(&entities.User{}, &entities.Post{})
 
 	setupTestData(db)
@@ -113,10 +116,71 @@ func TestFindByID(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	// then
-	var res map[string]entities.Post
+	var res map[string]output.PostResponse
 	json.Unmarshal([]byte(w.Body.String()), &res)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "テストアイテム3", res["data"].Title)
 	assert.Equal(t, uint(3), res["data"].ID)
+}
+
+func TestFindAll(t *testing.T) {
+	// given
+	db := setup()
+	postRepository := repositories.NewPostRepository(db)
+	postUsecase := usecases.NewPostUsecase(postRepository)
+	postController := NewPostController(postUsecase)
+
+	req := httptest.NewRequest("GET", "/posts", nil)
+	w := httptest.NewRecorder()
+
+	_, r := gin.CreateTestContext(w)
+
+	// when
+	r.GET("/posts", postController.FindAll)
+	r.ServeHTTP(w, req)
+
+	// then
+	var res map[string][]output.PostResponse
+	json.Unmarshal([]byte(w.Body.String()), &res)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, 3, len(res["data"]))
+	assert.Equal(t, res["data"][0].Title, "テストアイテム1")
+}
+
+func TestUpdate(t *testing.T) {
+	// given
+	db := setup()
+	postRepository := repositories.NewPostRepository(db)
+	authRepository := repositories.NewAuthRepository(db)
+	postUsecase := usecases.NewPostUsecase(postRepository)
+	authUsecase := usecases.NewAuthUsecase(authRepository)
+	postController := NewPostController(postUsecase)
+	authMiddleware := middleware.AuthMiddleware(authUsecase)
+
+	updatePost := input.UpdatePost{
+		ID:      3,
+		Title:   "テストアイテム1",
+		Content: "テスト1",
+	}
+	reqBody, _ := json.Marshal(updatePost)
+
+	req := httptest.NewRequest("PUT", "/posts/1", bytes.NewBuffer(reqBody))
+	w := httptest.NewRecorder()
+
+	_, r := gin.CreateTestContext(w)
+
+	// when
+	r.PUT("/posts/:id", authMiddleware, postController.Update)
+	r.ServeHTTP(w, req)
+
+	// then
+	var res map[string]output.PostResponse
+	json.Unmarshal([]byte(w.Body.String()), &res)
+
+	fmt.Println(w.Body.String())
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "テスト1", res["data"].Content)
 }
