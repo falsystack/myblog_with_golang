@@ -10,8 +10,9 @@ type User struct {
 	Posts []Post `json:"posts"`
 }
 
-func NewUser(name, email string) *User {
+func NewUser(id, name, email string) *User {
 	return &User{
+		ID:    id,
 		Name:  name,
 		Email: email,
 	}

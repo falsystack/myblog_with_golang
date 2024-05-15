@@ -11,6 +11,7 @@ var RecordNotFoundError = errors.New("record not found")
 
 type AuthRepository interface {
 	FindById(id string) (*entities.User, error)
+	Create(user *entities.User) error
 }
 
 type authRepository struct {
@@ -19,6 +20,14 @@ type authRepository struct {
 
 func NewAuthRepository(db *gorm.DB) AuthRepository {
 	return &authRepository{db: db}
+}
+
+func (ar *authRepository) Create(user *entities.User) error {
+	tx := ar.db.Create(user)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 func (ar *authRepository) FindById(id string) (*entities.User, error) {

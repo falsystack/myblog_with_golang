@@ -33,7 +33,7 @@ type AuthController interface {
 	// TODO: Create
 }
 
-func NewAuthController() AuthController {
+func NewAuthController(au usecases.AuthUsecase) AuthController {
 	log.Println("init auth controller", os.Getenv("GOOGLE_CLIENT_ID"))
 	googleOauthConfig = oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
@@ -42,7 +42,7 @@ func NewAuthController() AuthController {
 		RedirectURL:  "http://localhost:8080/auth/google/callback",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 	}
-	return &authController{}
+	return &authController{au: au}
 }
 
 type authController struct {
@@ -82,6 +82,10 @@ func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
 	}
 
 	// TODO: UserがDBにないと登録する
+	_, err = a.au.FindByID(goauth.ID)
+	if err != nil {
+
+	}
 
 	// jwtを生成
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
