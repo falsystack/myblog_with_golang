@@ -13,6 +13,7 @@ import (
 	"os"
 	"time"
 	"toyproject_recruiting_community/usecases"
+	"toyproject_recruiting_community/usecases/input"
 )
 
 var googleOauthConfig oauth2.Config
@@ -84,7 +85,14 @@ func (a *authController) GoogleAuthCallback(ctx *gin.Context) {
 	// TODO: UserがDBにないと登録する
 	_, err = a.au.FindByID(goauth.ID)
 	if err != nil {
-
+		err = a.au.Create(&input.CreateUser{
+			ID:    goauth.ID,
+			Email: goauth.Email,
+		})
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	// jwtを生成

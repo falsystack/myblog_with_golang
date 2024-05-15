@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"toyproject_recruiting_community/controller"
 	"toyproject_recruiting_community/infra"
+	"toyproject_recruiting_community/repositories"
 	"toyproject_recruiting_community/router"
+	"toyproject_recruiting_community/usecases"
 )
 
 func main() {
@@ -15,7 +17,10 @@ func main() {
 	router.PostRouter(r, db)
 
 	// auth
-	authController := controller.NewAuthController()
+	repository := repositories.NewAuthRepository(db)
+	usecase := usecases.NewAuthUsecase(repository)
+	authController := controller.NewAuthController(usecase)
+
 	authRouter := r.Group("/auth")
 	authRouter.GET("/google/login", authController.GoogleLogin)
 	authRouter.GET("/google/callback", authController.GoogleAuthCallback)
