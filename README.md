@@ -19,6 +19,9 @@
   - Infra as a Codeの勉強
 - CI/CD
   - CircleCI
+- API仕様書
+  - `gin-swagger`
+  - スキーマ駆動開発はよくないと思うのでgo言語のコードから文書を生成するようにする
 
 ## 要件
 ### v0.1スコープ

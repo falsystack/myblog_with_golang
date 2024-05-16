@@ -1,0 +1,10 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "このswaggerはgin-swaggerにより生成されました。",
+        "title": "Toy Project Recruiting Community",
+        "contact": {},
+        "version": "0.10"
+    },
+    "paths": {}
+}

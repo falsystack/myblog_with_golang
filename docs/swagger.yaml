@@ -1,0 +1,7 @@
+info:
+  contact: {}
+  description: このswaggerはgin-swaggerにより生成されました。
+  title: Toy Project Recruiting Community
+  version: "0.10"
+paths: {}
+swagger: "2.0"
