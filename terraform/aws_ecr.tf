@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "ap-northeast-1"
+}
+
 resource "aws_ecr_repository" "toy_project_repository" {
   name                 = "toy"
   image_tag_mutability = "MUTABLE"
