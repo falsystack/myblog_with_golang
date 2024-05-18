@@ -18,7 +18,7 @@
 - Terraform
   - Infra as a Codeの勉強
 - CI/CD
-  - CircleCI
+  - GithubActions
 - API仕様書
   - `gin-swagger`
   - スキーマ駆動開発はよくないと思うのでgo言語のコードから文書を生成するようにする
