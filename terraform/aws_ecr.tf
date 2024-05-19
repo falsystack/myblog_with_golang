@@ -89,7 +89,8 @@ data "aws_iam_policy_document" "github_action_role_policy" {
       identifiers = [aws_iam_openid_connect_provider.toy_project.arn]
     }
     condition {
-      test     = "StringEquals"
+#       test     = "StringEquals"
+      test     = "StringLike"
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
