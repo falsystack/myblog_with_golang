@@ -1,1 +1,1 @@
-FROM apline:3
+FROM alpine:3
