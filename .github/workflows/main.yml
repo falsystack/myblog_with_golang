@@ -17,7 +17,7 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: "ap-northeast-1"
-          role-to-assume: "arn:aws:iam::730595405892:policy/terraform"
+          role-to-assume: "arn:aws:iam::730595405892:role/github_action_role"
 
       # ECR ログイン
       - uses: aws-actions/amazon-ecr-login@v1
