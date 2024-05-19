@@ -83,16 +83,20 @@ resource "aws_iam_role" "github_action_role" {
 data "aws_iam_policy_document" "github_action_role_policy" {
   statement {
     effect = "Allow"
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.toy_project.arn]
     }
     condition {
-#       test     = "StringEquals"
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:falsystack/toyproject_recruiting_community:*"]
     }
   }
 }
