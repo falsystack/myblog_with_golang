@@ -63,6 +63,11 @@ func (pc *postController) Update(ctx *gin.Context) {
 }
 
 // FindAll return []output.PostResponse
+// @Summary Posts一覧を配列で返す
+// @Tags Posts
+// @Produce json
+// @Success 200 {object} []output.PostResponse
+// @Router /posts [get]
 func (pc *postController) FindAll(ctx *gin.Context) {
 	posts, err := pc.pu.FindAll()
 	if err != nil {

@@ -14,7 +14,46 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/posts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Posts一覧を配列で返す",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/output.PostResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "output.PostResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

@@ -1,7 +1,31 @@
+definitions:
+  output.PostResponse:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
 info:
   contact: {}
   description: このswaggerはgin-swaggerにより生成されました。
   title: Toy Project Recruiting Community
   version: "0.10"
-paths: {}
+paths:
+  /posts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/output.PostResponse'
+            type: array
+      summary: Posts一覧を配列で返す
+      tags:
+      - Posts
 swagger: "2.0"
