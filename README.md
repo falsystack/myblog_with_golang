@@ -1,4 +1,8 @@
 # ToyProject Recruiting Community With Golang
+
+> チームプロジェクトに変わったのでレポジトリを移動します。
+> https://github.com/orgs/Topu-project/repositories
+
 ## 目標
 - Go言語の勉強
 - Ginの勉強
